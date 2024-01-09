@@ -1,3 +1,6 @@
+import 'dart:developer';
+
+import 'package:geolocator/geolocator.dart';
 import 'package:weather_app/services/location.dart';
 import 'package:weather_app/services/networking.dart';
 
@@ -11,6 +14,30 @@ class WeatherModel {
 
     var weatherData = await networkHelper.getData();
     return weatherData;
+  }
+
+  static Future<bool> getLocationPermission() async {
+    bool isLocationPermissionAllowed = false;
+    LocationPermission permission;
+    try {
+      await Geolocator.isLocationServiceEnabled();
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.deniedForever) {
+        Geolocator.openLocationSettings();
+      }
+      if (permission == LocationPermission.whileInUse ||
+          permission == LocationPermission.always) {
+        isLocationPermissionAllowed = true;
+      } else
+        isLocationPermissionAllowed = false;
+    } catch (e) {
+      log(e.toString());
+
+      if (e.toString() != "Location services not enabled") {
+        throw const LocationServiceDisabledException();
+      }
+    }
+    return isLocationPermissionAllowed;
   }
 
   Future<dynamic> getLocationWeather() async {

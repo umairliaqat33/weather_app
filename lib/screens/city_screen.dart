@@ -7,59 +7,75 @@ class CityScreen extends StatefulWidget {
 }
 
 class _CityScreenState extends State<CityScreen> {
-  late String cityName;
-
+  final _formKey = GlobalKey<FormState>();
+  final TextEditingController _cityController = TextEditingController();
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Container(
-        decoration: BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage('images/city_background.jpg'),
-            fit: BoxFit.cover,
-          ),
-        ),
-        constraints: BoxConstraints.expand(),
-        child: SafeArea(
-          child: Column(
-            children: <Widget>[
-              Align(
-                alignment: Alignment.topLeft,
-                child: FlatButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  child: Icon(
-                    Icons.arrow_back_ios,
-                    size: 50.0,
+    return SafeArea(
+      child: Scaffold(
+        body: Form(
+          key: _formKey,
+          child: Container(
+            padding: EdgeInsets.only(
+              left: 16,
+              right: 16,
+            ),
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                image: AssetImage('images/city_background.jpg'),
+                fit: BoxFit.cover,
+              ),
+            ),
+            constraints: BoxConstraints.expand(),
+            child: Column(
+              children: <Widget>[
+                Align(
+                  alignment: Alignment.topLeft,
+                  child: IconButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    icon: Icon(
+                      Icons.arrow_back_ios,
+                      size: 50.0,
+                    ),
                   ),
                 ),
-              ),
-              Container(
-                padding: EdgeInsets.all(20.0),
-                child: TextField(
+                SizedBox(
+                  height: 10,
+                ),
+                TextFormField(
+                  controller: _cityController,
+                  decoration: kTextFieldInputDecoration,
                   style: TextStyle(
                     color: Colors.black,
                   ),
-                  decoration: kTextFieldInputDecoration,
-                  onChanged: (value) {
-                    cityName = value;
+                  validator: (String? value) {
+                    if (value!.isEmpty) {
+                      return "Please enter city name";
+                    } else {
+                      return null;
+                    }
                   },
                 ),
-              ),
-              TextButton(
-                onPressed: () {
-                  Navigator.pop(context, cityName);
-                },
-                child: Text(
-                  'Get Weather',
-                  style: kButtonTextStyle,
+                TextButton(
+                  onPressed: () => getCityWeather(),
+                  child: Text(
+                    'Get Weather',
+                    style: kButtonTextStyle,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
     );
+  }
+
+  void getCityWeather() {
+    if (_formKey.currentState!.validate()) {
+      Navigator.pop(context, _cityController.text);
+    }
   }
 }
